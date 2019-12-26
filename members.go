@@ -35,7 +35,7 @@ type MemberRequest struct {
 	Location        *MemberLocation        `json:"location,omitempty"`
 	IPOpt           string                 `json:"ip_opt,omitempty"`
 	IPSignup        string                 `json:"ip_signup,omitempty"`
-  Tags            []string               `json:"tags,omitempty"`
+	Tags            []string               `json:"tags,omitempty"`
 	TimestampSignup string                 `json:"timestamp_signup,omitempty"`
 	TimestampOpt    string                 `json:"timestamp_opt,omitempty"`
 }
@@ -107,8 +107,10 @@ func (list ListResponse) GetMembers(params *InterestCategoriesQueryParams) (*Lis
 		return nil, err
 	}
 
-	for _, m := range response.Members {
-		m.api = list.api
+	for idx := 0; idx < len(response.Members); idx++ {
+		v := response.Members[idx]
+		v.api = list.api
+		response.Members[idx] = v
 	}
 
 	return response, nil
@@ -178,9 +180,9 @@ func (list ListResponse) DeleteMember(id string) (bool, error) {
 type ListOfMemberActivity struct {
 	baseList
 
-	EmailID  string     `json:"email_id"`
-	ListID   string     `json:"list_id"`
-	Activity []Activity `json:"activity"`
+	EmailID  string           `json:"email_id"`
+	ListID   string           `json:"list_id"`
+	Activity []MemberActivity `json:"activity"`
 }
 
 type MemberActivity struct {

@@ -2,6 +2,7 @@ package gochimp3
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -13,6 +14,8 @@ import (
 	"reflect"
 	"regexp"
 	"time"
+
+	"github.com/PathDNA/ptk"
 )
 
 // URIFormat defines the endpoint for a single app
@@ -50,8 +53,19 @@ func New(apiKey string) *API {
 	}
 }
 
-// Request will make a call to the actual API.
 func (api API) Request(method, path string, params QueryParams, body, response interface{}) error {
+	// Retry 5 times every 2 minutes
+	return ptk.RetryCtx(context.Background(), func() error {
+		if err := api.rawRequest(method, path, params, body, response); err != nil {
+			return err
+		}
+
+		return nil
+	}, 5, time.Duration(2*time.Minute), 0)
+}
+
+// Request will make a call to the actual API.
+func (api API) rawRequest(method, path string, params QueryParams, body, response interface{}) error {
 	client := &http.Client{Transport: api.Transport}
 	if api.Timeout > 0 {
 		client.Timeout = api.Timeout
@@ -92,7 +106,7 @@ func (api API) Request(method, path string, params QueryParams, body, response i
 			}
 		}
 		req.URL.RawQuery = queryParams.Encode()
-		
+
 		if api.Debug {
 			log.Printf("Adding query params: %q\n", req.URL.Query())
 		}

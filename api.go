@@ -161,6 +161,7 @@ func (api API) RequestOk(method, path string) (bool, error) {
 }
 
 func parseAPIError(data []byte) error {
+	log.Println("MAILCHIMP ERROR", string(data))
 	apiError := new(APIError)
 	err := json.Unmarshal(data, apiError)
 	if err != nil {

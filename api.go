@@ -61,7 +61,7 @@ func (api API) Request(method, path string, params QueryParams, body, response i
 		}
 
 		return nil
-	}, 5, time.Duration(2*time.Minute), 0)
+	}, 5, time.Duration(7*time.Minute), 0)
 }
 
 // Request will make a call to the actual API.

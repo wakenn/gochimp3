@@ -8,6 +8,7 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -61,7 +62,11 @@ func (api API) Request(method, path string, params QueryParams, body, response i
 		}
 
 		return nil
-	}, 5, time.Duration(7*time.Minute), 0)
+	}, 5, time.Duration(Random(1, 10)*time.Minute), 0)
+}
+
+func Random(min, max int) time.Duration {
+	return time.Duration(rand.Intn(max-min) + min)
 }
 
 // Request will make a call to the actual API.

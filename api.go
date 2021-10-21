@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -166,7 +167,11 @@ func (api API) RequestOk(method, path string) (bool, error) {
 }
 
 func parseAPIError(data []byte) error {
-	log.Println("MAILCHIMP ERROR", string(data))
+	bdy := string(data)
+	if len(bdy) > 0 && bdy[0] == '<' {
+		return errors.New("akamai error")
+	}
+
 	apiError := new(APIError)
 	err := json.Unmarshal(data, apiError)
 	if err != nil {
